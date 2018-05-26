@@ -12,12 +12,19 @@ object Ops {
 
   implicit class NELOps[T](list: NonEmptyList[T]) {
     def random: T = {
-      list.toList(Math.abs(new Random().nextInt() % list.length)).asInstanceOf[T]
+      list.toList(Math.abs(new Random().nextInt() % list.length))
     }
 
     def randomWeighed(f: T => Int): T = {
       weightedPick(list, Random.nextInt(list.toList.map(f).sum), f)
     }
+  }
+
+  implicit class ListOps[T](list: List[T]) {
+    def random: Option[T] =
+      if(list.nonEmpty)
+        Some(list(Math.abs(new Random().nextInt() % list.length)))
+      else None
   }
 
   @tailrec
