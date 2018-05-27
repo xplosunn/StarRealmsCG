@@ -58,9 +58,15 @@ trait CommonEffects {
     case 8 => 9
   }
 
+  private val maxGold: Int => Int = {
+    case 2 => 3
+    case 3 => 3
+    case _ => 4
+  }
+
   val commonEffects = List(
     GenEffect(10, 0.35, Damage, dmgMaxStack),
-    GenEffect(10, 1, Gold, _ => 4),
+    GenEffect(10, 0.5, Gold, maxGold),
     GenEffect(2, 2.3, Draw, _ => 2),
     GenEffect(1, 2.3, DestroyBase, _ => 1)
   )
