@@ -8,5 +8,5 @@ scalacOptions += "-Ypartial-unification"
 
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % "1.1.0",
-  "com.beachape" %% "enumeratum" % "1.5.13"
+  "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
 )

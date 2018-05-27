@@ -7,7 +7,7 @@ case class GenEffect(probability: Int,
 
 object EffectGen {
   val commonEffects = List(
-    GenEffect(10, 0.35, Damage, 3),
+    GenEffect(10, 0.35, Damage, 9),
     GenEffect(10, 1, Gold, 4),
     GenEffect(2, 2.3, Draw, 2),
     GenEffect(1, 2.3, DestroyBase, 1)
@@ -19,9 +19,9 @@ object EffectGen {
   private def effectGen(cost: Int, genEffects: List[GenEffect]): List[(Effect, Int)] = {
     val costToSpendOpt = if(cost > 0) Some((1 to cost).toNEL().random) else None
 
-    def effectOpt(costToSpend: Int) = genEffects.filter(_.costPerEffect > costToSpend).random.map {
+    def effectOpt(costToSpend: Int): Option[(Effect, Int)] = genEffects.filter(_.costPerEffect <= costToSpend).random.map {
       genEffect =>
-        (genEffect.effect, toIntRoundedUp(Math.min(costToSpend, genEffect.maxStack) / genEffect.costPerEffect))
+        (genEffect.effect, Math.min(toIntRoundedUp(costToSpend / genEffect.costPerEffect), genEffect.maxStack))
     }
 
     (for {
