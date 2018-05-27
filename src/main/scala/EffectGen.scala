@@ -13,6 +13,9 @@ object EffectGen
     with BlobEffects
     with StarEmpireEffects {
 
+  val allEffects =
+    commonEffects ++ Faction.values.toList.flatMap(factionEffects)
+
   private def factionEffects(faction: Faction) = faction match {
     case TradeFederation => tradeFederationEffects
     case MachineCult => machineCultEffects
@@ -21,9 +24,9 @@ object EffectGen
   }
 
   def apply(faction: Faction, cost: Int): List[(Effect, Int)] =
-    effectGen(cost, commonEffects ++ factionEffects(faction))
+    effectGen(cost, commonEffects, factionEffects(faction))
 
-  private def effectGen(cost: Int, genEffects: List[GenEffect], maxEffects: Int = 3): List[(Effect, Int)] = {
+  private def effectGen(cost: Int, genEffects: List[GenEffect], additionalEffects: List[GenEffect] = List.empty, maxEffects: Int = 3): List[(Effect, Int)] = {
     val costToSpendOpt = if(cost > 0) Some((1 to cost).toNEL().random) else None
 
     def effectOpt(costToSpend: Int): Option[(Effect, Int)] = genEffects.filter(_.costPerEffect <= costToSpend).random.map {
@@ -38,7 +41,7 @@ object EffectGen
     } yield {
       val remainingCost = cost - costToSpend
       val remainEffects = genEffects.filter(_.effect != effect._1)
-      effect +: effectGen(remainingCost, remainEffects, maxEffects - 1)
+      effect +: effectGen(remainingCost, remainEffects ++ additionalEffects, maxEffects = maxEffects - 1)
     }).getOrElse(Nil)
   }
 }

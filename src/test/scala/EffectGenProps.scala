@@ -35,7 +35,15 @@ object EffectGenProps extends Properties("EffectGen") {
     }
   }
 
+  property("ships must have at least one common effect") = forAll(effectGen) { effectList =>
+    effectList.exists {
+      case (effect, _) =>
+        EffectGen.commonEffects.exists(_.effect == effect)
+    }
+
+  }
+
   def findGenEffect(effect: Effect): GenEffect =
-    EffectGen.commonEffects.filter(_.effect == effect).head
+    EffectGen.allEffects.filter(_.effect == effect).head
 
 }
