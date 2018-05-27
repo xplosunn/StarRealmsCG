@@ -3,14 +3,25 @@ import Ops._
 case class GenEffect(probability: Int,
                      costPerEffect: Double,
                      effect: Effect,
-                     maxStack: Int)
+                     maxStack: Int => Int)
 
 object EffectGen {
+  private val dmgMaxStack: Int => Int = {
+    case 1 => 3
+    case 2 => 4
+    case 3 => 6
+    case 4 => 6
+    case 5 => 6
+    case 6 => 8
+    case 7 => 8
+    case 8 => 9
+  }
+
   val commonEffects = List(
-    GenEffect(10, 0.35, Damage, 9),
-    GenEffect(10, 1, Gold, 4),
-    GenEffect(2, 2.3, Draw, 2),
-    GenEffect(1, 2.3, DestroyBase, 1)
+    GenEffect(10, 0.35, Damage, dmgMaxStack),
+    GenEffect(10, 1, Gold, _ => 4),
+    GenEffect(2, 2.3, Draw, _ => 2),
+    GenEffect(1, 2.3, DestroyBase, _ => 1)
   )
 
   def apply(faction: Faction, cost: Int): List[(Effect, Int)] =
@@ -21,7 +32,7 @@ object EffectGen {
 
     def effectOpt(costToSpend: Int): Option[(Effect, Int)] = genEffects.filter(_.costPerEffect <= costToSpend).random.map {
       genEffect =>
-        (genEffect.effect, Math.min(toIntRoundedUp(costToSpend / genEffect.costPerEffect), genEffect.maxStack))
+        (genEffect.effect, Math.min(toIntRoundedUp(costToSpend / genEffect.costPerEffect), genEffect.maxStack(costToSpend)))
     }
 
     (for {

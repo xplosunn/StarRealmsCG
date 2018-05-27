@@ -21,13 +21,6 @@ object EffectGenProps extends Properties("EffectGen") {
     effectList.length <= 3
   }
 
-  property("max stack holds") = forAll(effectGen) { effectList =>
-    effectList.forall {
-      case (effect, amount) =>
-        amount <= findGenEffect(effect).maxStack
-    }
-  }
-
   property("effect ammout > 0") = forAll(effectGen) { effectList =>
     effectList.forall {
       case (effect, amount) =>
@@ -35,28 +28,14 @@ object EffectGenProps extends Properties("EffectGen") {
     }
   }
 
-  property("acceptable damage") = forAll(effectGenWithCost) { case (effectList, cost) =>
-    def belowMaxDmgStack(cost: Int, dmg: Int): Boolean = {
-      cost match {
-        case 1 => dmg <= 3
-        case 2 => dmg <= 4
-        case 3 => dmg <= 6
-        case 4 => dmg <= 6
-        case 5 => dmg <= 6
-        case 6 => dmg <= 8
-        case 7 => dmg <= 8
-        case 8 => dmg <= 9
-        case _ => false
-      }
-    }
-
+  property("max stack holds") = forAll(effectGenWithCost) { case (effectList, cost) =>
     effectList.forall {
-      case (_, amount) =>
-        belowMaxDmgStack(cost, amount)
+      case (effect, amount) =>
+        amount <= findGenEffect(effect).maxStack(cost)
     }
   }
 
-  def findGenEffect(effect: Effect) =
+  def findGenEffect(effect: Effect): GenEffect =
     EffectGen.commonEffects.filter(_.effect == effect).head
 
 }
