@@ -16,7 +16,7 @@ object EffectGen {
   def apply(faction: Faction, cost: Int): List[(Effect, Int)] =
     effectGen(cost, commonEffects)
 
-  private def effectGen(cost: Int, genEffects: List[GenEffect]): List[(Effect, Int)] = {
+  private def effectGen(cost: Int, genEffects: List[GenEffect], maxEffects: Int = 3): List[(Effect, Int)] = {
     val costToSpendOpt = if(cost > 0) Some((1 to cost).toNEL().random) else None
 
     def effectOpt(costToSpend: Int): Option[(Effect, Int)] = genEffects.filter(_.costPerEffect <= costToSpend).random.map {
@@ -27,10 +27,11 @@ object EffectGen {
     (for {
       costToSpend <- costToSpendOpt
       effect <- effectOpt(costToSpend)
+      if maxEffects > 1
     } yield {
       val remainingCost = cost - costToSpend
       val remainEffects = genEffects.filter(_.effect != effect._1)
-      effect +: effectGen(remainingCost, remainEffects)
+      effect +: effectGen(remainingCost, remainEffects, maxEffects - 1)
     }).getOrElse(Nil)
   }
 }
